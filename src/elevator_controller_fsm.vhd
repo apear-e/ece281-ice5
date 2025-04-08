@@ -95,13 +95,42 @@ begin
 	-- CONCURRENT STATEMENTS ------------------------------------------------------------------------------
 	
 	-- Next State Logic
-  
+    f_Q_next <= s_floor1 when (f_Q = s_floor1) and (i_stop = '1') else
+                s_floor1 when (f_Q = s_floor1) and (i_up_down = '0') and (i_stop = '0') else
+                s_floor1 when (f_Q = s_floor2) and (i_up_down = '0') and (i_stop = '0') else
+                
+                s_floor2 when (f_Q = s_floor2) and (i_stop = '1') else
+                s_floor2 when (f_Q = s_floor1) and (i_up_down = '1') and (i_stop = '0') else
+                s_floor2 when (f_Q = s_floor3) and (i_up_down = '0') and (i_stop = '0') else
+                
+                s_floor3 when (f_Q = s_floor3) and (i_stop = '1') else
+                s_floor3 when (f_Q = s_floor2) and (i_up_down = '1') and (i_stop = '0') else
+                s_floor3 when (f_Q = s_floor4) and (i_up_down = '0') and (i_stop = '0') else
+                
+                s_floor4 when (f_Q = s_floor4) and (i_stop = '1') else
+                s_floor4 when (f_Q = s_floor4) and (i_up_down = '1') and (i_stop = '0') else
+                s_floor4 when (f_Q = s_floor3) and (i_up_down = '1') and (i_stop = '0') else
+                s_floor2;
+                
+            
 	-- Output logic
-
+    with f_Q select
+        o_floor <= "0001" when s_floor1,
+                   "0010" when s_floor2,
+                   "0100" when s_floor3,
+                   "1000" when s_floor4,
+                   "0001" when others;
 	-------------------------------------------------------------------------------------------------------
 	
 	-- PROCESSES ------------------------------------------------------------------------------------------	
-	
+	register_proc : process (i_clk, i_reset)
+	begin
+	   if i_reset = '1' then
+            f_Q <= s_floor2;        --reset state is floor 2
+       elsif (rising_edge(i_clk)) then
+            f_Q <= f_Q_next;    -- next state becomes current state
+       end if;
+	end process register_proc;
 	-- State register ------------
 	
 	
